@@ -1,0 +1,39 @@
+import tensorflow as tf
+from unpool import unpool
+import random
+
+tf.reset_default_graph()
+
+mat = list(range(64))
+random.shuffle(mat)
+mat = np.array(mat)
+mat = np.reshape(mat, [1,8,8,1])
+M = tf.constant(mat, dtype=tf.float32)
+keren1 = tf.get_variable('keren1', [3,3,1,1], initializer=tf.ones_initializer())
+keren2 = tf.get_variable('keren2', [3,3,1,1], initializer=tf.ones_initializer())
+conv1 = tf.nn.conv2d(M, keren1, strides=[1,1,1,1], padding='SAME')
+pool1, argmax1 = tf.nn.max_pool_with_argmax(conv1, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
+pool2, argmax2 = tf.nn.max_pool_with_argmax(pool1, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
+pool3, argmax3 = tf.nn.max_pool_with_argmax(pool2, ksize=[1,2,2,1], strides=[1,1,1,1], padding='SAME')
+
+unpool2 = unpool(pool3, argmax3, strides=[1,1,1,1], name='unpool3')
+unpool1 = unpool(unpool2, argmax2, strides=[1,2,2,1], name='unpool2')
+unpool0 = unpool(unpool1, argmax1, strides=[1,2,2,1], name='unpool1')
+
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    mat_out = mat[:,:,:,0]
+    conv1_out = sess.run(conv1)[0,:,:,0]
+    pool1_out = sess.run(pool1)[0,:,:,0]
+    pool2_out = sess.run(pool2)[0,:,:,0]
+    pool3_out = sess.run(pool3)[0,:,:,0]
+    argmax1_out = sess.run(argmax1)[0,:,:,0]
+    argmax2_out = sess.run(argmax2)[0,:,:,0]
+    argmax3_out = sess.run(argmax3)[0,:,:,0]
+    unpool2_out = sess.run(unpool2)[0,:,:,0]
+    unpool1_out = sess.run(unpool1)[0,:,:,0]
+    unpool0_out = sess.run(unpool0)[0,:,:,0]
+    print(unpool2_out)
+    print(unpool1_out)
+    print(unpool0_out)
