@@ -20,7 +20,6 @@ def unpool(x, argmax, strides, unpool_shape=None, batch_size=None, name='unpool'
     unpool = tf.get_variable(name=name, shape=[np.prod(unpool_shape)], initializer=tf.zeros_initializer(), trainable=False)
     argmax = tf.cast(argmax, tf.int32)
     argmax = tf.reshape(argmax, [np.prod(argmax_shape)])
-    x = tf.reshape(x, [np.prod(x_shape)])
     x = tf.reshape(x, [np.prod(argmax.get_shape().as_list())])
     unpool = tf.scatter_update(unpool, argmax, x)
     unpool = tf.reshape(unpool, unpool_shape)
