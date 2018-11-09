@@ -17,6 +17,8 @@ def unpool(x, argmax, strides, unpool_shape=None, batch_size=None, name='unpool'
         argmax_shape[0] = x_shape[0]
     if unpool_shape is None:
         unpool_shape = [x_shape[i] * strides[i] for i in range(4)]
+    elif unpool_shape[0] is None:
+        unpool_shape[0] = batch_size
     unpool = tf.get_variable(name=name, shape=[np.prod(unpool_shape)], initializer=tf.zeros_initializer(), trainable=False)
     argmax = tf.cast(argmax, tf.int32)
     argmax = tf.reshape(argmax, [np.prod(argmax_shape)])
